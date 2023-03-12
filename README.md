@@ -13,6 +13,8 @@ Installation
 
 Build the application:
     cd customer-api
+    // Install mux package in local workspace and then build
+    go get github.com/gorilla/mux
     go build
 
 Run the application:

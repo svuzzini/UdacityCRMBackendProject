@@ -34,6 +34,7 @@ func main() {
 	r := mux.NewRouter()
 
 	// Define routes and handlers
+	r.HandleFunc("/", homeHandler).Methods("GET")
 	r.HandleFunc("/customers", getCustomersHandler).Methods("GET")
 	r.HandleFunc("/customers/{id}", getCustomerHandler).Methods("GET")
 	r.HandleFunc("/customers", addCustomerHandler).Methods("POST")
@@ -41,7 +42,40 @@ func main() {
 	r.HandleFunc("/customers/{id}", deleteCustomerHandler).Methods("DELETE")
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":8080", r))
+	// log.Fatal(http.ListenAndServe(":8080", r))
+
+	http.Handle("/", r)
+
+    fmt.Println("Server listening on port 8080")
+    log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+    // Define the available endpoints
+    endpoints := []struct {
+        Method string
+        Path   string
+        Desc   string
+    }{
+        {"GET", "/customers", "Get all customers"},
+        {"GET", "/customers/{id}", "Get a single customer"},
+        {"POST", "/customers", "Add a new customer"},
+        {"PUT", "/customers/{id}", "Update an existing customer"},
+        {"DELETE", "/customers/{id}", "Delete a customer"},
+    }
+
+    // Generate the HTML response body
+    html := "<h1>Welcome to the Customer API</h1>"
+    html += "<h2>Available endpoints:</h2>"
+    html += "<ul>"
+    for _, ep := range endpoints {
+        html += fmt.Sprintf("<li><strong>%s</strong> %s - %s</li>", ep.Method, ep.Path, ep.Desc)
+    }
+    html += "</ul>"
+
+    // Set the response headers and write the response body
+    w.Header().Set("Content-Type", "text/html")
+    fmt.Fprint(w, html)
 }
 
 func getCustomersHandler(w http.ResponseWriter, r *http.Request) {
